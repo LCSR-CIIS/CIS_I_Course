@@ -1,0 +1,121 @@
+Metadata-Version: 2.4
+Name: uncertainty-networks
+Version: 0.1.0
+Summary: Simulation-based uncertainty propagation in geometric networks (SE(3))
+Author: X.M. Christine Zhu
+License: MIT
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+Requires-Dist: numpy>=1.23
+Provides-Extra: dev
+Requires-Dist: pytest>=7.0; extra == "dev"
+Requires-Dist: ruff>=0.1.0; extra == "dev"
+Requires-Dist: matplotlib>=3.6; extra == "dev"
+
+# Simulation-Based Uncertainty Propagation in Geometric Networks for Surgical Robotics
+
+This repository implements and validates a mathematical framework for **uncertainty propagation in geometric networks**, following the math note:
+
+> **Mathematical Framework for Uncertainty Propagation in Geometric Networks**
+
+The implementation includes:
+- SE(3) uncertainty propagation,
+- point uncertainty propagation,
+- network-level composition,
+- closed-loop conditioning,
+- and Monte Carlo validation.
+
+Find the math note in `docs/`.
+
+---
+
+## Procedure
+
+### 1) Clone the repository
+```bash
+git clone <your-repo-url>
+cd kinematic_error_propagation
+```
+
+### 2) Create / activate Python environment
+```bash
+python -m venv venv
+source venv/bin/activate   # macOS/Linux
+# or
+venv\Scripts\activate      # Windows
+```
+
+### 3) Install the package locally
+```bash
+pip install -e .
+```
+
+### 4) Verify Installation
+Run the full test suite:
+```bash
+pytest
+```
+All tests should pass.
+These tests verify SE(3) operations, covariance propagation, point uncertainty, network queries, and closed-loop conditioning.
+
+---
+
+## How to Run Validation Experiments
+All numerical results are generated via Monte Carlo validation scripts in ```scripts/```.
+
+### 1) SE(3) Open-Chain Propagation
+Validates first-order covariance propagation for SE(3) composition.
+```bash
+python scripts/validate_open_chain_mc.py
+```
+Output:
+- analytic covariance
+- Monte Carlo covariance
+- relative Frobenius error
+
+### 2) Point Uncertainty Propagation
+Validates CIS I point Jacobian and point covariance propagation.
+```bash
+python scripts/validate_point_mc.py
+```
+Output:
+- analytic point covariance
+- Monte Carlo point covariance
+- error metrics
+
+### 3) Random Network Validation
+Tests uncertainty propagation on randomly generated geometric networks.
+```bash
+python scripts/validate_random_network_mc.py
+```
+Output:
+- statistics over many random path queries
+- average and worst-case errors
+
+### 4) Closed-Loop Conditioning Validation
+Validates closed-loop inference using importance-weighted Monte Carlo simulation.
+```bash
+python scripts/validate_closed_loop_mc.py
+```
+Output:
+- analytic posterior covariance
+- Monte Carlo posterior covariance
+- effective sample size (ESS)
+- relative error metrics
+
+This script auto-tunes residual noise to stabilize Monte Carlo weighting.
+
+## Project Organization
+- src/uncertainty_networks/   -- Core library (math → code)
+- tests/                      -- Unit tests (correctness)
+- scripts/                    -- Monte Carlo validation
+- docs/                       -- Math note
+- TODO.md                     -- Roadmap and next steps
+
+---
+
+## Conventions and Notes
+- All perturbations follow the CIS I left-perturbation convention
+- Forward propagation and closed-loop inference are intentionally separated
+- Monte Carlo scripts are for validation, not production runtime
+- Network uncertainty assumes independent edges unless explicitly correlated
