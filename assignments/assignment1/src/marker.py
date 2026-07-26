@@ -1,0 +1,1 @@
+# they can update the nominal values relative to the marker body - should be able to do that on the api side. 
