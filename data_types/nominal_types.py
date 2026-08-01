@@ -2,7 +2,7 @@ from dataclasses import dataclass
 import math
 import numpy as np
 
-from .se3 import skew as _se3_skew, skew_axis as _se3_skew_axis
+from uncertainty_networks.se3 import skew as _se3_skew, skew_axis as _se3_skew_axis
 
 @dataclass
 class vct3:

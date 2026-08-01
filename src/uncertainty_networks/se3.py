@@ -69,6 +69,38 @@ def skew(w: Array) -> Array:
     )
 
 
+def skew_axis(M: Array) -> Array:
+    r"""
+    Inverse of skew(): extract the vector w ∈ R^3 such that skew(w) == M.
+
+    Defensively averages the antisymmetric part of M, so small numerical
+    asymmetry in the input doesn't affect the result:
+
+        w_x = 0.5 * (M[2,1] - M[1,2])
+        w_y = 0.5 * (M[0,2] - M[2,0])
+        w_z = 0.5 * (M[1,0] - M[0,1])
+
+    Parameters
+    ----------
+    M : array-like, shape (3,3)
+        Skew-symmetric matrix.
+
+    Returns
+    -------
+    ndarray, shape (3,)
+        The vector w such that skew(w) == M.
+    """
+    M = np.asarray(M, dtype=np.float64).reshape(3, 3)
+    return np.array(
+        [
+            0.5 * (M[2, 1] - M[1, 2]),
+            0.5 * (M[0, 2] - M[2, 0]),
+            0.5 * (M[1, 0] - M[0, 1]),
+        ],
+        dtype=np.float64,
+    )
+
+
 def is_se3(T: Array, atol: float = 1e-8) -> bool:
     r"""
     Lightweight structural check for a homogeneous transform T ∈ SE(3).

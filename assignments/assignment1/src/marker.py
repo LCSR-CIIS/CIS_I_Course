@@ -1,32 +1,48 @@
 # they can update the nominal values relative to the marker body - should be able to do that on the api side. 
 from typing import List, Union
 
-from uncertainty_networks.nominal_types import vct3
-from uncertainty_networks.uncertain_types import uvct3
+from data_types.nominal_types import vct3, Frame
+from data_types.uncertain_types import uvct3, uFrame
 from .utils import sample_normal
 
-MarkerPosition = Union[vct3, uvct3]
+# Covariance in markers would be changed to a directional vector with a radius of N mm.
 
-class Markers:
-
-    def __init__(self, name, nominal_marker_positions: List[MarkerPosition]):
+class MarkerBody:
+    def __init__(self, name, nominal_marker_positions: List[vct3], world_frame: Union[Frame, uFrame]):
         self.name = name
-        self.nominal_marker_positions = nominal_marker_positions # vct3 or uvct3 type; error-free marker positions
-        self.actual_marker_positions = None # vct3 type
-        self.C = None
-
-    def set_cov(self, C):
-        self.C = C
-        return self
-
-    def create_marker_body(self, nominal_marker_positions: List[MarkerPosition]):
         self.nominal_marker_positions = nominal_marker_positions
-        # here sampling can also depend on the params of uvct3?
-        self.actual_marker_positions = sample_normal(nominal_marker_positions, cov=self.C)
+        self.observed_marker_positions = None  # populated by Tracker via tracker-error covariance
+        # frames that need to be initialized
+        self.world_frame = world_frame  # position of marker body wrt world frame
+        self._actual_marker_positions = None
+        self.__manufacturing_cov = None  # ground-truth covariance; never exposed publicly
+
+    def _set_manufacturing_cov(self, cov):
+        """Instructor-only: covariance used to sample actual marker
+        positions from the student-submitted nominal ones. Not part of the
+        student-facing API."""
+        self.__manufacturing_cov = cov
+        self._actual_marker_positions = None  # invalidate any cached sample
         return self
 
-    def add_marker_positions(self, nominal_marker_positions: List[MarkerPosition]):
-        for pos in nominal_marker_positions:
-            self.nominal_marker_positions.append(pos)
-            self.actual_marker_positions.append(sample_normal([pos], cov=self.C)[0])
+    def set_marker_positions(self, nominal_marker_positions: List[vct3]):
+        self.nominal_marker_positions = nominal_marker_positions
+        self._actual_marker_positions = None  # invalidate any cached sample
         return self
+
+    def add_marker_positions(self, nominal_marker_positions: List[vct3]):
+        self.nominal_marker_positions.extend(nominal_marker_positions)
+        self._actual_marker_positions = None  # invalidate any cached sample
+        return self
+
+    def get_actual_marker_positions(self) -> List[uvct3]:
+        if self._actual_marker_positions is None:
+            if self.__manufacturing_cov is None:
+                raise RuntimeError("manufacturing covariance has not been set")
+            self._actual_marker_positions = sample_normal(
+                self.nominal_marker_positions, cov=self.__manufacturing_cov
+            )
+        return self._actual_marker_positions
+
+    def update_world_frame(self, frame: Union[Frame, uFrame]):
+        self.world_frame = frame

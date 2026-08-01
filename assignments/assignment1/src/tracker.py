@@ -1,52 +1,44 @@
-from typing import List
+from typing import Union
 
 from .utils import sample_normal
-from uncertainty_networks.nominal_types import vct3, Frame
-from marker import Markers
+from data_types.nominal_types import vct3, Frame
+from data_types.uncertain_types import uvct3, uFrame
+from data_types.covariance_types import Covariance
+from .marker import MarkerBody
 
 
 class Tracker:
 
-    def __init__(self, name):
+    def __init__(self, name, F: Union[Frame, uFrame]):
         self.name = name
-        self.F = None  # Frame position of the tracking camera in the world coordinate system
-        self.C = None  # Covariance matrix representing the uncertainty of the tracker's pose
-        self.marker_positions = []
+        #if students can call self.F, wouldn't they be able to know the covariance of F? Work around that
+        self.F = F  # Frame position of the tracking camera in the world coordinate system; set by students
+        self.marker_positions = []  # observed marker positions in the tracker's coordinate frame
 
     def __repr__(self):
-        return f"Tracker(name={self.name!r}, F={self.F!r}, C={self.C!r})"
+        return f"Tracker(name={self.name!r}, F={self.F!r})"
 
-    def create(self, frame: Frame, cov):
-        self.F = frame
-        self.C = cov
+    def set_pose(self, frame: Union[Frame, uFrame]):
+        self.F = uFrame(frame)
         return self
 
-    def set_pose(self, frame: Frame):
-        # when setting a new pose for the tracker, do we need to update the covariance as well?
-        self.F = frame
+    # this method should be private, we are the ones changing the covariance of the tracker
+    def _set_cov(self, cov: Covariance):  # here we might want to pass just np.ndarray, but then we avoid any checks
+        self.F = uFrame(self.F, cov)
         return self
 
-    def set_cov(self, cov):
-        # update the covariance matrix for the tracker
-        self.C = cov
-        return self
-
-    def read_markers(self, marker: "Markers"): # CHANGE: here it should read a Marker object instead of raw positions
+    def read_marker_body(self, marker_body: MarkerBody):
         # read the marker positions and update the tracker's state accordingly
         '''
-        input: marker - a Marker object containing nominal and observed marker positions
+        input: marker_body - a Marker Body object containing nominal, observed marker positions
         output: samples - list of sampled marker positions
         '''
-        n = len(marker.observed_marker_positions)
-        samples = []
+        n = len(marker_body.nominal_marker_positions)
+        self.marker_positions = marker_body.get_actual_marker_positions()
         for i in range(n):
-            marker_pos_tracker = self.F.inv() * marker.observed_marker_positions[i]
-            marker_pos_tracker_sampled = sample_normal(
-                marker_pos_tracker.vec.squeeze(1), cov=self.C)
-            samples.append(marker_pos_tracker_sampled)
-        return samples
+            marker_pos_tracker_observed = self.F.inv() * self.marker_positions[i] # read actual marker positions, they have their own covariance. uFrame supports multiplying uncertain transform with uncertain point
+            self.marker_positions.append(marker_pos_tracker_observed)
+        return self.marker_positions
 
-    def add_marker_position(self, marker_pos: vct3):
-        # add a new marker position in the world coordinate system to the list of seen marker positions
-        self.marker_positions.append(marker_pos)
-        return self
+    def procrustes_solver(self):
+        pass

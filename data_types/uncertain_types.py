@@ -73,8 +73,8 @@ import numpy as np
 from scipy.spatial.transform import Rotation as _ScipyRot
 
 from .nominal_types import vct3, Rot, Frame
-from .uncertain_geometry import UncertainTransform, Convention
-from .se3 import skew
+from uncertainty_networks.uncertain_geometry import UncertainTransform, Convention
+from uncertainty_networks.se3 import skew
 from .covariance_types import Covariance
 
 
