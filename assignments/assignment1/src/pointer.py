@@ -8,22 +8,22 @@ TipPosition = Union[vct3, uvct3]
 
 
 class Pointer:
-    def __init__(self, name, tip_position_nominal: TipPosition = None):
+    def __init__(self, name, nominal_tip_position: TipPosition = None):
         self.name = name
-        self.tip_position_nominal = tip_position_nominal
-        self.tip_position_actual = None
+        self.nominal_tip_position = nominal_tip_position
+        self.actual_tip_position = None
 
     def set_tip_position_nominal(self, position: TipPosition):
-        self.tip_position_nominal = position
+        self.nominal_tip_position = position
         return self
 
     def sample_tip_position_actual(self, cov):
-        self.tip_position_actual = sample_normal([self.tip_position_nominal], cov=cov)[0]
+        self.actual_tip_position = sample_normal([self.nominal_tip_position], cov=cov)[0]
         return self
 
-    def create_pointer_body(self, tip_position_nominal: TipPosition, cov):
-        self.set_tip_position_nominal(tip_position_nominal)
-        self.tip_position_actual = sample_normal([self.tip_position_nominal], cov=cov)[0]
+    def create_pointer_body(self, nominal_tip_position: TipPosition, cov):
+        self.set_tip_position_nominal(nominal_tip_position)
+        self.actual_tip_position = sample_normal([self.nominal_tip_position], cov=cov)[0]
         return self
 
 # TBD
