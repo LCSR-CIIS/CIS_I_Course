@@ -22,7 +22,7 @@ class Tracker:
         self.F = uFrame(frame)
         return self
 
-    # this method should be private, we are the ones changing the covariance of the tracker
+    # this method should be private, we are the ones changing the covariance of the tracker. we can let the students change the covariance while debugging,
     def _set_cov(self, cov: Covariance):  # here we might want to pass just np.ndarray, but then we avoid any checks
         self.F = uFrame(self.F, cov)
         return self
