@@ -14,35 +14,35 @@ class MarkerBody:
         self.observed_marker_positions = None  # populated by Tracker via tracker-error covariance
         # frames that need to be initialized
         self.world_frame = world_frame  # position of marker body wrt world frame
-        self._actual_marker_positions = None
-        self.__manufacturing_cov = None  # ground-truth covariance; never exposed publicly
+        self.actual_marker_positions = None
+        self.manufacturing_cov = None  # ground-truth covariance; never exposed publicly
 
-    def _set_manufacturing_cov(self, cov):
+    def set_manufacturing_cov(self, cov): 
         """Instructor-only: covariance used to sample actual marker
         positions from the student-submitted nominal ones. Not part of the
         student-facing API."""
-        self.__manufacturing_cov = cov
-        self._actual_marker_positions = None  # invalidate any cached sample
+        self.manufacturing_cov = cov
+        self.actual_marker_positions = None  # invalidate any cached sample
         return self
 
     def set_marker_positions(self, nominal_marker_positions: List[vct3]):
         self.nominal_marker_positions = nominal_marker_positions
-        self._actual_marker_positions = None  # invalidate any cached sample
+        self.actual_marker_positions = None  # invalidate any cached sample
         return self
 
     def add_marker_positions(self, nominal_marker_positions: List[vct3]):
         self.nominal_marker_positions.extend(nominal_marker_positions)
-        self._actual_marker_positions = None  # invalidate any cached sample
+        self.actual_marker_positions = None  # invalidate any cached sample
         return self
 
     def get_actual_marker_positions(self) -> List[uvct3]:
-        if self._actual_marker_positions is None:
-            if self.__manufacturing_cov is None:
+        if self.actual_marker_positions is None:
+            if self.manufacturing_cov is None:
                 raise RuntimeError("manufacturing covariance has not been set")
             self._actual_marker_positions = sample_normal(
-                self.nominal_marker_positions, cov=self.__manufacturing_cov
+                self.nominal_marker_positions, cov=self.manufacturing_cov
             )
-        return self._actual_marker_positions
+        return self.actual_marker_positions
 
     def update_world_frame(self, frame: Union[Frame, uFrame]):
         self.world_frame = frame
