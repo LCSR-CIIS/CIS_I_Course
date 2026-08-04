@@ -41,4 +41,5 @@ class Tracker:
         return self.marker_positions
 
     def procrustes_solver(self):
+        # or a quaternion method from the lecture notes
         pass
