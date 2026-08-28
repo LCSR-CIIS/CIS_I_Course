@@ -1,8 +1,8 @@
-# they can update the nominal values relative to the marker body - should be able to do that on the api side. 
 from typing import List, Union
 
 from data_types.nominal_types import vct3, Frame
 from data_types.uncertain_types import uvct3, uFrame
+from data_types.covariance_types import Covariance
 from .utils import sample_normal
 
 # Covariance in markers would be changed to a directional vector with a radius of N mm.
@@ -36,10 +36,14 @@ class MarkerBody:
         if self.actual_marker_positions is None:
             if self.manufacturing_cov is None:
                 raise RuntimeError("manufacturing covariance has not been set")
-            self._actual_marker_positions = sample_normal(
-                self.nominal_marker_positions, cov=self.manufacturing_cov
-            )
+            sampled = sample_normal(self.nominal_marker_positions, cov=self.manufacturing_cov)
+            self.actual_marker_positions = [uvct3(p) for p in sampled]
         return self.actual_marker_positions
+
+    def get_marker_positions_world_frame(self) -> List[uvct3]:
+        if self.world_frame is None:
+            raise RuntimeError("marker world frame has not been set")
+        return [self.world_frame * p for p in self.nominal_marker_positions], [self.world_frame * p for p in self.get_actual_marker_positions()]
 
     def update_world_frame(self, frame: Union[Frame, uFrame]):
         self.world_frame = frame
