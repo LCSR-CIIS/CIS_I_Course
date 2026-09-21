@@ -14,5 +14,13 @@ from .marker import MarkerBody
 from .pointer import Pointer
 
 from .utils import sample_normal
+from . import simulation
 
-__all__ = ['Tracker', 'MarkerBody', 'Pointer', 'sample_normal']
+from data_types.nominal_types import vct3, Rot, Frame
+from data_types.uncertain_types import uvct3, uRot, uFrame
+from data_types.covariance_types import Covariance
+
+__all__ = [
+	'Tracker', 'MarkerBody', 'Pointer', 'sample_normal', 'simulation',
+	'vct3', 'Rot', 'Frame', 'uvct3', 'uRot', 'uFrame', 'Covariance',
+]

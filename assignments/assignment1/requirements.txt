@@ -4,3 +4,6 @@ pydantic
 numpy
 requests
 pyyaml
+scipy
+matplotlib
+ipykernel

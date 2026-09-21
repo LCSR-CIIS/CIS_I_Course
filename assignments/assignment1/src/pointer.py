@@ -15,9 +15,9 @@ class Pointer:
         self.nominal_tip_position = nominal_tip_position
         self.marker_body = marker_body  # marker body on the pointer; also owns the pointer's world frame
         self.actual_tip_position = None
-        self.manufacturing_cov = None  # ground-truth covariance; never exposed publicly
+        self.manufacturing_cov = None
 
-    def set_manufacturing_cov(self, cov):  # instructor-only, mirrors MarkerBody.set_manufacturing_cov
+    def set_manufacturing_cov(self, cov):
         self.manufacturing_cov = cov
         self.actual_tip_position = None  # invalidate any cached sample
         return self

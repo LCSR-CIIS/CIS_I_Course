@@ -210,7 +210,7 @@ class Rot:
         if axis_vec.shape == (3,):
             if angle is None:
                 raise TypeError("Rot: an arbitrary rotation axis requires angle=...")
-            from .se3 import exp_so3 as _exp_so3
+            from uncertainty_networks.se3 import exp_so3 as _exp_so3
             axis_norm = float(np.linalg.norm(axis_vec))
             if axis_norm < 1e-15:
                 raise ValueError("Rot: rotation axis must be nonzero")
@@ -326,7 +326,7 @@ class Rot:
 
     def axis_angle(self):
         """Returns (axis: vct3, angle: float) such that self == Rot(axis, angle=angle)."""
-        from .se3 import log_so3 as _log_so3
+        from uncertainty_networks.se3 import log_so3 as _log_so3
         phi = _log_so3(self._matrix)
         angle = float(np.linalg.norm(phi))
         if angle < 1e-12:

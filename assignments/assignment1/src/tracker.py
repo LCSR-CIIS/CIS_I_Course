@@ -29,7 +29,7 @@ class Tracker:
         return self
 
     def read_marker_body(self, marker_body: MarkerBody, jiggle_cov: Covariance = None,
-                          sensor_noise_cov: Covariance = None, world_frame: Frame = None) -> List[uvct3]: 
+                          sensor_noise_cov: Covariance = None, body_placement: Frame = None) -> List[uvct3]:
         '''
         Reads marker_body's markers through this tracker, in the tracker's
         own coordinate frame.
