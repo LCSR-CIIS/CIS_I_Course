@@ -1,9 +1,5 @@
-fastapi
-uvicorn
-pydantic
 numpy
-requests
-pyyaml
 scipy
 matplotlib
 ipykernel
+notebook
