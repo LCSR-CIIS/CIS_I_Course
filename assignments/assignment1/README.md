@@ -15,7 +15,6 @@ assignment1/
 │   └── simulation/                -- the functions you'll actually call
 └── notebooks/
     ├── assignment1_template.ipynb   <- start here, this is your homework
-    └── assignment1_solution.ipynb   <- reference solution (see note below)
 ```
 
 You do not need to read or modify anything under `src/` — you only call
